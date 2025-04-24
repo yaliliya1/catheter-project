@@ -1,36 +1,60 @@
-# Catheter Placement Classification (ADS2002 Project)
+# Catheter Placement Classification (ADS2002 Project – Monash University)
 
-This project was developed as part of the ADS2002 unit at Monash University. The goal was to build a deep learning model that can identify the presence of various catheters and lines in chest X-ray images, and further detect whether they are correctly positioned.
+This repository presents a deep learning pipeline developed as part of the ADS2002 unit at Monash University. The goal was to build a multi-stage model for medical image analysis, specifically focused on classifying and localizing catheters in chest radiographs to support clinical decision-making and reduce risks caused by catheter misplacement.
 
-## 📌 Project Objective
+---
 
-Incorrect placement of medical lines such as nasogastric or endotracheal tubes can lead to serious complications. This project aims to automate the detection and positioning of these lines from chest radiographs using deep learning models.
+## 🏥 Background
 
-The tasks include:
-- Classifying the presence of different types of catheters and tubes.
-- Identifying whether any of them are malpositioned.
-- Interpreting model behavior using saliency maps and occlusion.
-- Evaluating model performance in a multi-label classification setting.
+Incorrect placement of medical catheters, such as Central Venous Catheters (CVCs), Endotracheal Tubes (ETTs), and Nasogastric Tubes (NGTs), can cause severe complications, including organ damage or even death. In this project, we use deep learning to identify:
+- Whether catheters are present
+- Whether they are placed correctly
+- The brand/type and exact position of each catheter
 
-## 🗃️ Dataset
+---
 
-We used the [RANZCR CLiP](https://www.kaggle.com/c/ranzcr-clip-catheter-line-classification/) dataset, which includes annotated chest X-rays for multiple catheter types. Only the training dataset was used in this project.
+## 🎯 Objectives
+
+- Predict correct vs incorrect catheter placement from chest X-rays
+- Detect catheter type and brand using image classification
+- Segment catheter locations with pixel-level annotations
+- Interpret model performance and visualize learned features
+
+---
+
+## 📚 Dataset
+
+The dataset used is the publicly available **[RANZCR CLiP](https://www.kaggle.com/c/ranzcr-clip-catheter-line-classification/)** dataset. It includes thousands of labeled chest X-rays with annotations indicating the presence, position, and type of multiple catheters.
+
+---
 
 ## 🧠 Methodology
 
-- Image preprocessing and feature extraction
-- Model training using:
-  - ResNet for image-level classification
-  - U-Net for segmentation and tube tip localization
-- Combined outputs for malposition detection
-- Model interpretability with Grad-CAM and image occlusion
-- Evaluation using multi-label metrics (e.g., F1 score, AUC)
+### 1. Binary Classification – Catheter Placement Accuracy
+- **Model**: YOLOv8 (small, medium, large variants)
+- **Data**: Reformatted X-rays labeled as “normal” or “not normal” based on positioning
+- **Result**: Medium YOLOv8 model (1024px input) detected ~80% of fully abnormal cases
 
-## 🏆 Results
+### 2. Multi-label Classification – Catheter Type & Brand
+- **Models**: ResNet50, DenseNet121 (via Keras)
+- **Metric**: AUC score (suited for imbalanced medical datasets)
+- **Result**: DenseNet achieved 91% AUC; ResNet achieved 87%
 
+### 3. Segmentation – Catheter Localization
+- **Model**: U-Net with attention mechanism
+- **Preprocessing**: Augmentation (rotate, brightness, contrast, noise), rescaling to 512×512
+- **Loss Function**: Combined Binary Cross-Entropy and Dice Loss
+- **Result**: 98% validation accuracy using only CPU training
+
+---
+
+## 💡 Results Summary
+
+- All models were trained on CPU due to GPU/CUDA limitations.
+- YOLOv8 showed high precision for clear abnormal placements.
+- DenseNet121 was the most effective for multi-label brand classification.
+- U-Net achieved fine-grained catheter localization with high segmentation quality.
+- Our pipeline demonstrates the potential of CNN-based architectures for medical support tools.
 - Achieved High Distinction (HD) in ADS2002
-- Successfully identified multiple catheter types with reasonable accuracy
-- Demonstrated early understanding of model interpretability techniques
-
 
 
